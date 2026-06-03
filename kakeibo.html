@@ -5,7 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="家計簿">
+<link id="apple-touch-icon" rel="apple-touch-icon">
 <title>レシート家計簿</title>
+<script>
+// ホーム画面アイコンをcanvasで生成
+(function(){
+  const S = 180;
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const ctx = c.getContext('2d');
+
+  // 背景：角丸+グラデーション
+  const r = 38;
+  ctx.beginPath();
+  ctx.moveTo(r, 0); ctx.lineTo(S-r, 0);
+  ctx.quadraticCurveTo(S, 0, S, r);
+  ctx.lineTo(S, S-r);
+  ctx.quadraticCurveTo(S, S, S-r, S);
+  ctx.lineTo(r, S);
+  ctx.quadraticCurveTo(0, S, 0, S-r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, S, S);
+  grad.addColorStop(0, '#6fa3ff');
+  grad.addColorStop(1, '#2f5fd8');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // レシート本体
+  const rx=44, ry=28, rw=92, rh=108;
+  ctx.fillStyle = 'rgba(255,255,255,0.97)';
+  ctx.beginPath();
+  ctx.moveTo(rx+8, ry);
+  ctx.lineTo(rx+rw-8, ry);
+  ctx.lineTo(rx+rw, ry+8);
+  ctx.lineTo(rx+rw, ry+rh);
+  // ギザギザ下端
+  const teeth = 7;
+  const tw = rw / teeth;
+  for (let i = teeth; i >= 0; i--) {
+    const x = rx + i * tw;
+    const py = (i % 2 === 0) ? ry+rh : ry+rh+9;
+    ctx.lineTo(x, py);
+  }
+  ctx.lineTo(rx, ry+8);
+  ctx.closePath();
+  ctx.fill();
+
+  // ¥ マーク
+  ctx.fillStyle = '#3a6fd8';
+  ctx.font = 'bold 52px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('¥', rx + rw/2, ry + rh/2 - 4);
+
+  // 横線（明細っぽく）
+  ctx.strokeStyle = 'rgba(79,134,247,0.25)';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  [68, 78].forEach(ly => {
+    ctx.beginPath();
+    ctx.moveTo(rx+12, ly); ctx.lineTo(rx+rw-12, ly);
+    ctx.stroke();
+  });
+
+  // リンクにセット
+  document.getElementById('apple-touch-icon').href = c.toDataURL('image/png');
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
